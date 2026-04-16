@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import urllib.parse
 from datetime import datetime
+from location_filter import is_valid_location
 
 def scrape_twitter_via_yahoo():
     # 検索クエリ： キャスト募集 -エキストラ
@@ -39,7 +40,8 @@ def scrape_twitter_via_yahoo():
             if "キャスト募集" in t and len(t) > 20: # arbitrary minimum length
                 valid_genre = "映画" in t or "ドラマ" in t
                 is_excluded = any(kw in t for kw in ["所属", "モデル"])
-                if valid_genre and not is_excluded:
+                is_valid_area = is_valid_location(t)
+                if valid_genre and is_valid_area and not is_excluded:
                     items.append({
                         "title": t[:100] + "...",
                         "url": "https://twitter.com/search?q=" + encoded_query,
@@ -53,7 +55,8 @@ def scrape_twitter_via_yahoo():
             t = tweet.text.strip()
             valid_genre = "映画" in t or "ドラマ" in t
             is_excluded = any(kw in t for kw in ["所属", "モデル"])
-            if valid_genre and not is_excluded:
+            is_valid_area = is_valid_location(t)
+            if valid_genre and is_valid_area and not is_excluded:
                 items.append({
                     "title": t[:100] + "...",
                     "url": "https://twitter.com/search?q=" + encoded_query,

@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from location_filter import is_valid_location
 
 def scrape_debut():
     url = "https://audition-debut.com/audition/"
@@ -22,8 +23,9 @@ def scrape_debut():
                 # Filter for Movie/Drama and exclude agency/models
                 valid_genre = "映画" in text or "ドラマ" in text
                 is_excluded = any(kw in text for kw in ["所属", "モデル"])
+                is_valid_area = is_valid_location(text)
                 
-                if valid_genre and not is_excluded:
+                if valid_genre and is_valid_area and not is_excluded:
                     link = href if href.startswith("http") else "https://audition-debut.com" + href
                     items.append({
                         "title": text,

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
+from location_filter import is_valid_location
 
 URL = "https://cinepu.com/cast/"
 
@@ -52,8 +53,9 @@ def scrape_cinepu_cast():
         text_to_check = title + " " + tags
         valid_genre = "映画" in text_to_check or "ドラマ" in text_to_check
         is_excluded = any(kw in text_to_check for kw in ["所属", "モデル"])
+        is_valid_area = is_valid_location(text_to_check)
         
-        if valid_genre and not is_excluded:
+        if valid_genre and is_valid_area and not is_excluded:
             entry = {
                 "title": title,
                 "url": link,
