@@ -56,8 +56,15 @@ def determine_genre(title, tags):
 
 def is_extra_project(title, tags):
     target = (title + tags).lower()
-    # If explicitly mentioning extra, return True
     if re.search(r'(エキストラ|通行人|スタンドイン|協力者|無報酬|交通費のみ|ノーギャラ)', target):
+        return True
+    return False
+
+def is_male_only_project(title):
+    t = title.lower()
+    if re.search(r'(男女|女|ヒロイン|お母さん|母親|主婦|娘|ガール|姉|妹)', t):
+        return False
+    if re.search(r'(男性|男|ボーイズ|おじさん|お爺さん|彼氏|夫|兄|弟|オジサン)', t):
         return True
     return False
 
@@ -77,6 +84,9 @@ def upload_from_file(filename, default_media="シネマプランナーズ"):
             continue
         # Check extra
         if is_extra_project(item["title"], item["tags"]):
+            continue
+        # Check male only
+        if is_male_only_project(item["title"]):
             continue
         filtered_items.append(item)
             

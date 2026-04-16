@@ -48,19 +48,22 @@ def scrape_cinepu_cast():
         is_paid = "報酬あり" in labels
         is_ticketback = "チケットバック制" in labels
         
-        # Filter (Customize this as needed)
-        # For now, let's just collect everything but mark them
+        # Filter logic: only Movies/Dramas, exclude "所属" (agency) and "モデル" (model)
+        text_to_check = title + " " + tags
+        valid_genre = "映画" in text_to_check or "ドラマ" in text_to_check
+        is_excluded = any(kw in text_to_check for kw in ["所属", "モデル"])
         
-        entry = {
-            "title": title,
-            "url": link,
-            "tags": tags,
-            "date": date.replace("投稿日：", ""),
-            "is_paid": is_paid,
-            "is_ticketback": is_ticketback,
-            "labels": labels
-        }
-        results.append(entry)
+        if valid_genre and not is_excluded:
+            entry = {
+                "title": title,
+                "url": link,
+                "tags": tags,
+                "date": date.replace("投稿日：", ""),
+                "is_paid": is_paid,
+                "is_ticketback": is_ticketback,
+                "labels": labels
+            }
+            results.append(entry)
         
     print(f"Extracted {len(results)} items.")
     

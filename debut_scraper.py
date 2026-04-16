@@ -19,15 +19,20 @@ def scrape_debut():
         if "audition/list" in href or "audition/detail" in href:
             text = a.text.strip().replace('\n', '')
             if len(text) > 5 and text not in [i["title"] for i in items]:
-                link = href if href.startswith("http") else "https://audition-debut.com" + href
-                items.append({
-                    "title": text,
-                    "url": link,
-                    "tags": "[デビュー][オーディション]",
-                    "date": "2026-04",
-                    "is_paid": True, # For now
-                    "is_ticketback": False
-                })
+                # Filter for Movie/Drama and exclude agency/models
+                valid_genre = "映画" in text or "ドラマ" in text
+                is_excluded = any(kw in text for kw in ["所属", "モデル"])
+                
+                if valid_genre and not is_excluded:
+                    link = href if href.startswith("http") else "https://audition-debut.com" + href
+                    items.append({
+                        "title": text,
+                        "url": link,
+                        "tags": "[デビュー][オーディション]",
+                        "date": "2026-04",
+                        "is_paid": True, # For now
+                        "is_ticketback": False
+                    })
     
     print(f"Found {len(items)} items")
     

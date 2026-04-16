@@ -37,25 +37,31 @@ def scrape_twitter_via_yahoo():
         for text_block in soup.find_all('span'):
             t = text_block.text.strip()
             if "キャスト募集" in t and len(t) > 20: # arbitrary minimum length
+                valid_genre = "映画" in t or "ドラマ" in t
+                is_excluded = any(kw in t for kw in ["所属", "モデル"])
+                if valid_genre and not is_excluded:
+                    items.append({
+                        "title": t[:100] + "...",
+                        "url": "https://twitter.com/search?q=" + encoded_query,
+                        "tags": "[X/Twitter]",
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "is_paid": True, # assume valid for Notion upload tracking
+                        "is_ticketback": False
+                    })
+    else:
+        for tweet in tweets:
+            t = tweet.text.strip()
+            valid_genre = "映画" in t or "ドラマ" in t
+            is_excluded = any(kw in t for kw in ["所属", "モデル"])
+            if valid_genre and not is_excluded:
                 items.append({
                     "title": t[:100] + "...",
                     "url": "https://twitter.com/search?q=" + encoded_query,
                     "tags": "[X/Twitter]",
                     "date": datetime.now().strftime("%Y-%m-%d"),
-                    "is_paid": True, # assume valid for Notion upload tracking
+                    "is_paid": True,
                     "is_ticketback": False
                 })
-    else:
-        for tweet in tweets:
-            t = tweet.text.strip()
-            items.append({
-                "title": t[:100] + "...",
-                "url": "https://twitter.com/search?q=" + encoded_query,
-                "tags": "[X/Twitter]",
-                "date": datetime.now().strftime("%Y-%m-%d"),
-                "is_paid": True,
-                "is_ticketback": False
-            })
 
     # remove duplicates
     unique_items = {i['title']:i for i in items}.values()
